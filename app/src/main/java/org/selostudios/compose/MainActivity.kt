@@ -1,18 +1,21 @@
 package org.selostudios.compose
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -29,22 +32,64 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //SampleColumn()
-            /*val painter = painterResource(id = R.drawable.ic_kotlin)
-            ImageCard(
-                painter = painter,
-                contentDescription = "Kotlin Icon",
-                title = "Kotlin Icon"
-            )
-            */
-            //TextModifiers(text = "This is some random text to test with")
+            ShowUI()
         }
     }
+}
+@Composable
+fun ShowUI() {
+
+    //SampleColumn()
+    /*val painter = painterResource(id = R.drawable.ic_kotlin)
+    Box(modifier = Modifier.fillMaxSize(0.5f)) {
+        ImageCard(
+            painter = painter,
+            contentDescription = "Kotlin Icon",
+            title = "Kotlin Icon"
+        )
+    }
+     */
+    //TextModifiers(text = "This is some random text to test with")
+    /*val color = remember { //Remembers value from last recomposition. External state
+        mutableStateOf(Color.Yellow)
+    }
+    Column() {
+        StateTest(
+            Modifier.weight(1f).fillMaxSize()
+        ) {
+            color.value = it
+        }
+        Box(modifier = Modifier.weight(2f).background(color.value).fillMaxSize())
+    }
+     */
+}
+
+@Composable
+fun StateTest(modifier: Modifier = Modifier, updateColor: (Color) -> Unit) {
+    val color = remember { //Remembers value from last recomposition. Internal state
+        mutableStateOf(Color.Yellow)
+    }
+    Box(modifier = modifier
+        .background(Color.Red)
+        .clickable {
+            updateColor(
+                Color(
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    Random.nextFloat(),
+                    1f
+                )
+            )
+
+        }
+    )
 }
 
 @Composable
@@ -159,15 +204,5 @@ fun SampleColumn() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    //SampleColumn()
-    /*val painter = painterResource(id = R.drawable.ic_kotlin)
-    Box(modifier = Modifier.fillMaxSize(0.5f)) {
-        ImageCard(
-            painter = painter,
-            contentDescription = "Kotlin Icon",
-            title = "Kotlin Icon"
-        )
-    }
-     */
-    //TextModifiers(text = "This is some random text to test with")
+    ShowUI()
 }

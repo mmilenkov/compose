@@ -1,6 +1,5 @@
 package org.selostudios.compose
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,12 +9,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -32,7 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
@@ -69,6 +66,48 @@ fun ShowUI() {
         Box(modifier = Modifier.weight(2f).background(color.value).fillMaxSize())
     }
      */
+    //SnackBarTest()
+}
+
+@Composable
+fun SnackBarTest() {
+    // This allows full control for it. Permanently displayed
+    Snackbar() {
+        Text(text = "SnackbarText")
+    }
+    //Handles already existing material design components
+    val scaffoldState = rememberScaffoldState()
+    var textFieldState by remember {
+        mutableStateOf("")
+    }
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = scaffoldState
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 30.dp)
+        ) {
+            TextField(value = textFieldState, label = {
+                Text(text = "Enter your name")
+            },
+            onValueChange = { textFieldState = it },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                scope.launch {
+                    scaffoldState.snackbarHostState.showSnackbar("Hello $textFieldState")
+                }
+            }) {
+                Text("Please greet me!")
+            }
+        }
+    }
 }
 
 @Composable

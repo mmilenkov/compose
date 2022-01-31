@@ -3,11 +3,10 @@ package org.selostudios.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -24,6 +23,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +67,44 @@ fun ShowUI() {
     }
      */
     //SnackBarTest()
+    //ListTest()
+}
+
+@Composable
+fun ListTest() {
+    //For a low number of items use Column (under 5)
+   /* val scrollState = rememberScrollState()
+    Column(modifier = Modifier.verticalScroll(state = scrollState)) {
+        for (i in 1..50) {
+            Text(
+                "Item: $i",
+                textAlign = TextAlign.Center,
+                fontSize = 25.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }*/
+    //Equivalent to RecyclerView. For above 5 items. Scrollable by default
+    LazyColumn {
+        //itemsIndexed() // Essentually a for each loop
+        itemsIndexed(listOf("This","is","a","sample")) { index, string ->
+            Text(
+                "Item: $index Text: $string",
+                textAlign = TextAlign.Center,
+                fontSize = 25.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        /*items(5000) { //it = index
+            Text(
+                "Item: $it",
+                textAlign = TextAlign.Center,
+                fontSize = 25.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }*/
+
+    }
 }
 
 @Composable

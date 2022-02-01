@@ -2,6 +2,8 @@ package org.selostudios.compose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -32,10 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
+var i = 0
+
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -71,7 +77,90 @@ fun ShowUI() {
      */
     //SnackBarTest()
     //ListTest()
-    ConstraintLayout()
+    //ConstraintLayout()
+}
+
+@Composable
+fun SideEffects(backDispatcher: OnBackPressedDispatcher) {
+    // sideEffect - executed after every recomposition of our composable
+    i++ // This is a sideEffect
+    SideEffect { // called when a composable is recomposed
+        i++
+    }
+
+    val callback = remember {
+        object  : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                //Do something
+            }
+
+        }
+    }
+    //Added on every recomposition, but not removed. Memory leak
+    //Use the below instead
+    //backDispatcher.addCallback(callback)
+
+    //This is used to clear after a composable is destroyed
+    DisposableEffect(key1 = backDispatcher) {
+        backDispatcher.addCallback(callback)
+        onDispose {
+            callback.remove()
+        }
+    }
+}
+
+@Composable
+fun SideEffects2() {
+    val scaffoldState = rememberScaffoldState()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = scaffoldState
+    ) {
+        var counter by remember {
+            mutableStateOf(0)
+        }
+
+        if(counter % 5 == 0 && counter > 0) {
+            //This effect cancels a coroutine and restarts it
+                LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
+                    scaffoldState.snackbarHostState.showSnackbar("Snackbar")
+                }
+        }
+        Button(onClick = { counter++ }) {
+            Text("Clicked $counter times")
+        }
+    }
+}
+
+@Composable
+fun SideEffects3() {
+    // Based on LaunchedEffect. Executes async code inside coroutine
+    // Once it is finished it will parse the result into state and trigger
+    // composable to recompose. E.g network call
+    val scaffoldState = rememberScaffoldState()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = scaffoldState
+    ) {
+        //Immutable.
+        val counter = produceState(initialValue = 0) {
+            delay(3000L)
+            value = 4
+        }
+
+        if(counter.value % 5 == 0 && counter.value > 0) {
+            //This effect cancels a coroutine and restarts it
+            LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
+                scaffoldState.snackbarHostState.showSnackbar("Snackbar")
+            }
+        }
+        Button(onClick = {  }) {
+            Text("Clicked ${counter.value} times")
+        }
+    }
+
 }
 
 @Composable
@@ -102,8 +191,12 @@ fun ConstraintLayout() {
         constraints,
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(modifier = Modifier.background(Color.Red).layoutId("boxOne"))
-        Box(modifier = Modifier.background(Color.Yellow).layoutId("boxTwo"))
+        Box(modifier = Modifier
+            .background(Color.Red)
+            .layoutId("boxOne"))
+        Box(modifier = Modifier
+            .background(Color.Yellow)
+            .layoutId("boxTwo"))
     }
 
 }

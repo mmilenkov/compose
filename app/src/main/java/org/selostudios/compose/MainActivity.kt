@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -29,6 +30,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -68,6 +71,41 @@ fun ShowUI() {
      */
     //SnackBarTest()
     //ListTest()
+    ConstraintLayout()
+}
+
+@Composable
+fun ConstraintLayout() {
+    val constraints = ConstraintSet {
+        val boxOne = createRefFor("boxOne") //Creates reference for composable in constraint
+        val boxTwo = createRefFor("boxTwo")
+        val guideline = createGuidelineFromTop(200.dp)
+        //val barrier = createTopBarrier()
+
+        constrain(boxOne) {
+            top.linkTo(parent.top) // top constraint
+            start.linkTo(parent.start) // start constraint
+            end.linkTo(parent.end)
+            width = Dimension.matchParent // comes from constraint layout
+            height = Dimension.value(200.dp)
+        }
+
+        constrain(boxTwo) {
+            top.linkTo(boxOne.bottom)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+            width = Dimension.matchParent
+            height = Dimension.value(200.dp)
+        }
+    }
+    androidx.constraintlayout.compose.ConstraintLayout(
+        constraints,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(modifier = Modifier.background(Color.Red).layoutId("boxOne"))
+        Box(modifier = Modifier.background(Color.Yellow).layoutId("boxTwo"))
+    }
+
 }
 
 @Composable

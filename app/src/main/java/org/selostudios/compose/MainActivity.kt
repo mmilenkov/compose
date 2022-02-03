@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,19 +38,27 @@ import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.selostudios.compose.ui.HomeScreen
+import org.selostudios.compose.ui.theme.RelaxationAppUiTheme
 import kotlin.random.Random
 
 var i = 0
 
+@ExperimentalFoundationApi
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ShowUI()
+            RelaxationAppUiTheme() {
+                HomeScreen()
+            }
         }
     }
 }
+
+//Random Samples
+//region
 @Composable
 fun ShowUI() {
 
@@ -78,6 +88,57 @@ fun ShowUI() {
     //SnackBarTest()
     //ListTest()
     //ConstraintLayout()
+    //SimpleAnimations()
+}
+
+@Composable
+fun SimpleAnimations() {
+    var sizeState by remember {
+        mutableStateOf(200.dp)
+    }
+    //Interpolates between size for animation
+    val size by animateDpAsState(
+        targetValue = sizeState,
+        animationSpec = keyframes { //Large control
+            durationMillis = 5000
+            sizeState at 0 with LinearEasing
+            sizeState * 1.5f at 1000 with FastOutLinearInEasing
+            sizeState * 2f at 5000  with LinearOutSlowInEasing
+        }
+
+        /*spring( //Bouncy animation
+            Spring.DampingRatioMediumBouncy
+        )*/
+
+        /*tween(
+            delayMillis = 1000,
+            durationMillis = 2000,
+            easing = LinearOutSlowInEasing
+        )//Animation curve*/
+    )
+
+    //infinite animation
+    val infiniteTransition = rememberInfiniteTransition()
+    val color by infiniteTransition.animateColor(
+        initialValue = Color.Red,
+        targetValue = Color.DarkGray,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000,500, FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Box(
+        modifier = Modifier
+            .size(size)
+            .background(color),
+    contentAlignment = Alignment.Center) {
+        Button(onClick = {
+            sizeState += 50.dp
+        }) {
+            Text("++")
+        }
+    }
 }
 
 @Composable
@@ -408,6 +469,7 @@ fun SampleColumn() {
         Text(text = "Hello Compose", modifier = Modifier.offset(20.dp, 10.dp))
     }
 }
+//endregion
 
 @Preview(showBackground = true)
 @Composable
